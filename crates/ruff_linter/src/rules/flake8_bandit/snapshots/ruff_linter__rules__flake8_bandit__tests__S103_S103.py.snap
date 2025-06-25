@@ -1,138 +1,525 @@
 ---
 source: crates/ruff_linter/src/rules/flake8_bandit/mod.rs
 ---
-S103.py:6:25: S103 `os.chmod` setting a permissive mask `0o227` on file or directory
-  |
-4 | keyfile = "foo"
-5 |
-6 | os.chmod("/etc/passwd", 0o227)  # Error
-  |                         ^^^^^ S103
-7 | os.chmod("/etc/passwd", 0o7)  # Error
-8 | os.chmod("/etc/passwd", 0o664)  # OK
-  |
-
-S103.py:7:25: S103 `os.chmod` setting a permissive mask `0o7` on file or directory
-  |
-6 | os.chmod("/etc/passwd", 0o227)  # Error
-7 | os.chmod("/etc/passwd", 0o7)  # Error
-  |                         ^^^ S103
-8 | os.chmod("/etc/passwd", 0o664)  # OK
-9 | os.chmod("/etc/passwd", 0o777)  # Error
-  |
-
-S103.py:9:25: S103 `os.chmod` setting a permissive mask `0o777` on file or directory
+S103.py:8:25: S103 `os.chmod` setting world-writable permissions `0o227`
    |
- 7 | os.chmod("/etc/passwd", 0o7)  # Error
- 8 | os.chmod("/etc/passwd", 0o664)  # OK
- 9 | os.chmod("/etc/passwd", 0o777)  # Error
+ 6 | # ============================================================================
+ 7 | keyfile = "foo"
+ 8 | os.chmod("/etc/passwd", 0o227)  # Error - world-writable
    |                         ^^^^^ S103
-10 | os.chmod("/etc/passwd", 0o770)  # Error
-11 | os.chmod("/etc/passwd", 0o776)  # Error
+ 9 | os.chmod("/etc/passwd", 0o7)    # Error - world-writable and executable
+10 | os.chmod("/etc/passwd", 0o664)  # OK
    |
 
-S103.py:10:25: S103 `os.chmod` setting a permissive mask `0o770` on file or directory
+S103.py:9:25: S103 `os.chmod` setting world-writable permissions `0o7`
    |
- 8 | os.chmod("/etc/passwd", 0o664)  # OK
- 9 | os.chmod("/etc/passwd", 0o777)  # Error
-10 | os.chmod("/etc/passwd", 0o770)  # Error
+ 7 | keyfile = "foo"
+ 8 | os.chmod("/etc/passwd", 0o227)  # Error - world-writable
+ 9 | os.chmod("/etc/passwd", 0o7)    # Error - world-writable and executable
+   |                         ^^^ S103
+10 | os.chmod("/etc/passwd", 0o664)  # OK
+11 | os.chmod("/etc/passwd", 0o777)  # Error - world-writable
+   |
+
+S103.py:11:25: S103 `os.chmod` setting world-writable permissions `0o777`
+   |
+ 9 | os.chmod("/etc/passwd", 0o7)    # Error - world-writable and executable
+10 | os.chmod("/etc/passwd", 0o664)  # OK
+11 | os.chmod("/etc/passwd", 0o777)  # Error - world-writable
    |                         ^^^^^ S103
-11 | os.chmod("/etc/passwd", 0o776)  # Error
-12 | os.chmod("/etc/passwd", 0o760)  # OK
+12 | os.chmod("/etc/passwd", 0o770)  # Error - overly permissive group
+13 | os.chmod("/etc/passwd", 0o776)  # Error - world-writable
    |
 
-S103.py:11:25: S103 `os.chmod` setting a permissive mask `0o776` on file or directory
+S103.py:12:25: S103 `os.chmod` setting overly permissive group permissions `0o770`
    |
- 9 | os.chmod("/etc/passwd", 0o777)  # Error
-10 | os.chmod("/etc/passwd", 0o770)  # Error
-11 | os.chmod("/etc/passwd", 0o776)  # Error
+10 | os.chmod("/etc/passwd", 0o664)  # OK
+11 | os.chmod("/etc/passwd", 0o777)  # Error - world-writable
+12 | os.chmod("/etc/passwd", 0o770)  # Error - overly permissive group
    |                         ^^^^^ S103
-12 | os.chmod("/etc/passwd", 0o760)  # OK
-13 | os.chmod("~/.bashrc", 511)  # Error
+13 | os.chmod("/etc/passwd", 0o776)  # Error - world-writable
+14 | os.chmod("/etc/passwd", 0o760)  # OK
    |
 
-S103.py:13:23: S103 `os.chmod` setting a permissive mask `0o777` on file or directory
+S103.py:13:25: S103 `os.chmod` setting world-writable permissions `0o776`
    |
-11 | os.chmod("/etc/passwd", 0o776)  # Error
-12 | os.chmod("/etc/passwd", 0o760)  # OK
-13 | os.chmod("~/.bashrc", 511)  # Error
+11 | os.chmod("/etc/passwd", 0o777)  # Error - world-writable
+12 | os.chmod("/etc/passwd", 0o770)  # Error - overly permissive group
+13 | os.chmod("/etc/passwd", 0o776)  # Error - world-writable
+   |                         ^^^^^ S103
+14 | os.chmod("/etc/passwd", 0o760)  # OK
+15 | os.chmod("~/.bashrc", 511)      # Error - 511 = 0o777
+   |
+
+S103.py:15:23: S103 `os.chmod` setting world-writable permissions `0o777`
+   |
+13 | os.chmod("/etc/passwd", 0o776)  # Error - world-writable
+14 | os.chmod("/etc/passwd", 0o760)  # OK
+15 | os.chmod("~/.bashrc", 511)      # Error - 511 = 0o777
    |                       ^^^ S103
-14 | os.chmod("/etc/hosts", 0o777)  # Error
-15 | os.chmod("/tmp/oh_hai", 0x1FF)  # Error
+16 | os.chmod("/etc/hosts", 0o777)   # Error - world-writable
+17 | os.chmod("/tmp/oh_hai", 0x1FF)  # Error - 0x1FF = 511 = 0o777
    |
 
-S103.py:14:24: S103 `os.chmod` setting a permissive mask `0o777` on file or directory
+S103.py:16:24: S103 `os.chmod` setting world-writable permissions `0o777`
    |
-12 | os.chmod("/etc/passwd", 0o760)  # OK
-13 | os.chmod("~/.bashrc", 511)  # Error
-14 | os.chmod("/etc/hosts", 0o777)  # Error
+14 | os.chmod("/etc/passwd", 0o760)  # OK
+15 | os.chmod("~/.bashrc", 511)      # Error - 511 = 0o777
+16 | os.chmod("/etc/hosts", 0o777)   # Error - world-writable
    |                        ^^^^^ S103
-15 | os.chmod("/tmp/oh_hai", 0x1FF)  # Error
-16 | os.chmod("/etc/passwd", stat.S_IRWXU)  # OK
+17 | os.chmod("/tmp/oh_hai", 0x1FF)  # Error - 0x1FF = 511 = 0o777
+18 | os.chmod("/etc/passwd", stat.S_IRWXU)  # OK - 0o700
    |
 
-S103.py:15:25: S103 `os.chmod` setting a permissive mask `0o777` on file or directory
+S103.py:17:25: S103 `os.chmod` setting world-writable permissions `0o777`
    |
-13 | os.chmod("~/.bashrc", 511)  # Error
-14 | os.chmod("/etc/hosts", 0o777)  # Error
-15 | os.chmod("/tmp/oh_hai", 0x1FF)  # Error
+15 | os.chmod("~/.bashrc", 511)      # Error - 511 = 0o777
+16 | os.chmod("/etc/hosts", 0o777)   # Error - world-writable
+17 | os.chmod("/tmp/oh_hai", 0x1FF)  # Error - 0x1FF = 511 = 0o777
    |                         ^^^^^ S103
-16 | os.chmod("/etc/passwd", stat.S_IRWXU)  # OK
-17 | os.chmod(keyfile, 0o777)  # Error
+18 | os.chmod("/etc/passwd", stat.S_IRWXU)  # OK - 0o700
+19 | os.chmod(keyfile, 0o777)        # Error - world-writable
    |
 
-S103.py:17:19: S103 `os.chmod` setting a permissive mask `0o777` on file or directory
+S103.py:19:19: S103 `os.chmod` setting world-writable permissions `0o777`
    |
-15 | os.chmod("/tmp/oh_hai", 0x1FF)  # Error
-16 | os.chmod("/etc/passwd", stat.S_IRWXU)  # OK
-17 | os.chmod(keyfile, 0o777)  # Error
+17 | os.chmod("/tmp/oh_hai", 0x1FF)  # Error - 0x1FF = 511 = 0o777
+18 | os.chmod("/etc/passwd", stat.S_IRWXU)  # OK - 0o700
+19 | os.chmod(keyfile, 0o777)        # Error - world-writable
    |                   ^^^^^ S103
-18 | os.chmod(keyfile, 0o7 | 0o70 | 0o700)  # Error
-19 | os.chmod(keyfile, stat.S_IRWXO | stat.S_IRWXG | stat.S_IRWXU)  # Error
+20 | os.chmod(keyfile, 0o7 | 0o70 | 0o700)  # Error - results in 0o777
+21 | os.chmod(keyfile, stat.S_IRWXO | stat.S_IRWXG | stat.S_IRWXU)  # Error - 0o777
    |
 
-S103.py:18:19: S103 `os.chmod` setting a permissive mask `0o777` on file or directory
+S103.py:20:19: S103 `os.chmod` setting world-writable permissions `0o777`
    |
-16 | os.chmod("/etc/passwd", stat.S_IRWXU)  # OK
-17 | os.chmod(keyfile, 0o777)  # Error
-18 | os.chmod(keyfile, 0o7 | 0o70 | 0o700)  # Error
+18 | os.chmod("/etc/passwd", stat.S_IRWXU)  # OK - 0o700
+19 | os.chmod(keyfile, 0o777)        # Error - world-writable
+20 | os.chmod(keyfile, 0o7 | 0o70 | 0o700)  # Error - results in 0o777
    |                   ^^^^^^^^^^^^^^^^^^ S103
-19 | os.chmod(keyfile, stat.S_IRWXO | stat.S_IRWXG | stat.S_IRWXU)  # Error
-20 | os.chmod("~/hidden_exec", stat.S_IXGRP)  # Error
+21 | os.chmod(keyfile, stat.S_IRWXO | stat.S_IRWXG | stat.S_IRWXU)  # Error - 0o777
+22 | os.chmod("~/hidden_exec", stat.S_IXGRP)  # Error - group executable only (unusual)
    |
 
-S103.py:19:19: S103 `os.chmod` setting a permissive mask `0o777` on file or directory
+S103.py:21:19: S103 `os.chmod` setting world-writable permissions `0o777`
    |
-17 | os.chmod(keyfile, 0o777)  # Error
-18 | os.chmod(keyfile, 0o7 | 0o70 | 0o700)  # Error
-19 | os.chmod(keyfile, stat.S_IRWXO | stat.S_IRWXG | stat.S_IRWXU)  # Error
+19 | os.chmod(keyfile, 0o777)        # Error - world-writable
+20 | os.chmod(keyfile, 0o7 | 0o70 | 0o700)  # Error - results in 0o777
+21 | os.chmod(keyfile, stat.S_IRWXO | stat.S_IRWXG | stat.S_IRWXU)  # Error - 0o777
    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ S103
-20 | os.chmod("~/hidden_exec", stat.S_IXGRP)  # Error
-21 | os.chmod("~/hidden_exec", stat.S_IXOTH)  # OK
+22 | os.chmod("~/hidden_exec", stat.S_IXGRP)  # Error - group executable only (unusual)
+23 | os.chmod("~/hidden_exec", stat.S_IXOTH)  # Error - world-executable
    |
 
-S103.py:20:27: S103 `os.chmod` setting a permissive mask `0o10` on file or directory
+S103.py:23:27: S103 `os.chmod` setting world-executable permissions `0o1`
    |
-18 | os.chmod(keyfile, 0o7 | 0o70 | 0o700)  # Error
-19 | os.chmod(keyfile, stat.S_IRWXO | stat.S_IRWXG | stat.S_IRWXU)  # Error
-20 | os.chmod("~/hidden_exec", stat.S_IXGRP)  # Error
+21 | os.chmod(keyfile, stat.S_IRWXO | stat.S_IRWXG | stat.S_IRWXU)  # Error - 0o777
+22 | os.chmod("~/hidden_exec", stat.S_IXGRP)  # Error - group executable only (unusual)
+23 | os.chmod("~/hidden_exec", stat.S_IXOTH)  # Error - world-executable
    |                           ^^^^^^^^^^^^ S103
-21 | os.chmod("~/hidden_exec", stat.S_IXOTH)  # OK
-22 | os.chmod("/etc/passwd", stat.S_IWOTH)  # Error
+24 | os.chmod("/etc/passwd", stat.S_IWOTH)    # Error - world-writable
+25 | os.chmod("/etc/passwd", 0o100000000)     # Error - large number, should be masked
    |
 
-S103.py:22:25: S103 `os.chmod` setting a permissive mask `0o2` on file or directory
+S103.py:24:25: S103 `os.chmod` setting world-writable permissions `0o2`
    |
-20 | os.chmod("~/hidden_exec", stat.S_IXGRP)  # Error
-21 | os.chmod("~/hidden_exec", stat.S_IXOTH)  # OK
-22 | os.chmod("/etc/passwd", stat.S_IWOTH)  # Error
+22 | os.chmod("~/hidden_exec", stat.S_IXGRP)  # Error - group executable only (unusual)
+23 | os.chmod("~/hidden_exec", stat.S_IXOTH)  # Error - world-executable
+24 | os.chmod("/etc/passwd", stat.S_IWOTH)    # Error - world-writable
    |                         ^^^^^^^^^^^^ S103
-23 | os.chmod("/etc/passwd", 0o100000000)  # Error
+25 | os.chmod("/etc/passwd", 0o100000000)     # Error - large number, should be masked
    |
 
-S103.py:23:25: S103 `os.chmod` setting an invalid mask on file or directory
+S103.py:35:25: S103 `os.chmod` setting world-executable permissions `0o755`
    |
-21 | os.chmod("~/hidden_exec", stat.S_IXOTH)  # OK
-22 | os.chmod("/etc/passwd", stat.S_IWOTH)  # Error
-23 | os.chmod("/etc/passwd", 0o100000000)  # Error
-   |                         ^^^^^^^^^^^ S103
+33 | os.chmod("/tmp/large2", 0o777777 & 0o600)   # Should be 0o600 (safe)
+34 | os.chmod("/tmp/large3", 0o777777 & 0o644)   # Should be 0o644 (safe)
+35 | os.chmod("/tmp/large4", 0o777777 & 0o755)   # Should be 0o755 (world-executable)
+   |                         ^^^^^^^^^^^^^^^^ S103
+36 | os.chmod("/tmp/large5", 0o1000000 & 0o600)  # Should be 0o600 (safe)
    |
+
+S103.py:39:29: S103 `os.chmod` setting world-writable permissions `0o777`
+   |
+38 | # These should still trigger violations after masking
+39 | os.chmod("/tmp/large_bad1", 0o777777 & 0o777)  # Should be 0o777 (world-writable)
+   |                             ^^^^^^^^^^^^^^^^ S103
+40 | os.chmod("/tmp/large_bad2", 0o777777 & 0o666)  # Should be 0o666 (world-writable)
+41 | os.chmod("/tmp/large_bad3", 0o1777777 & 0o4755) # Should be 0o4755 (setuid)
+   |
+
+S103.py:40:29: S103 `os.chmod` setting world-writable permissions `0o666`
+   |
+38 | # These should still trigger violations after masking
+39 | os.chmod("/tmp/large_bad1", 0o777777 & 0o777)  # Should be 0o777 (world-writable)
+40 | os.chmod("/tmp/large_bad2", 0o777777 & 0o666)  # Should be 0o666 (world-writable)
+   |                             ^^^^^^^^^^^^^^^^ S103
+41 | os.chmod("/tmp/large_bad3", 0o1777777 & 0o4755) # Should be 0o4755 (setuid)
+   |
+
+S103.py:41:29: S103 `os.chmod` setting setuid/setgid permissions `0o4755`
+   |
+39 | os.chmod("/tmp/large_bad1", 0o777777 & 0o777)  # Should be 0o777 (world-writable)
+40 | os.chmod("/tmp/large_bad2", 0o777777 & 0o666)  # Should be 0o666 (world-writable)
+41 | os.chmod("/tmp/large_bad3", 0o1777777 & 0o4755) # Should be 0o4755 (setuid)
+   |                             ^^^^^^^^^^^^^^^^^^ S103
+42 |
+43 | # Very large numbers that should be masked down
+   |
+
+S103.py:44:24: S103 `os.chmod` setting world-writable permissions `0o123`
+   |
+43 | # Very large numbers that should be masked down
+44 | os.chmod("/tmp/huge1", 0o12345670123)          # Should be masked to valid range
+   |                        ^^^^^^^^^^^^^ S103
+45 | os.chmod("/tmp/huge2", 0o77777777777)          # Should be masked to valid range
+   |
+
+S103.py:45:24: S103 `os.chmod` setting setuid/setgid permissions `0o7777`
+   |
+43 | # Very large numbers that should be masked down
+44 | os.chmod("/tmp/huge1", 0o12345670123)          # Should be masked to valid range
+45 | os.chmod("/tmp/huge2", 0o77777777777)          # Should be masked to valid range
+   |                        ^^^^^^^^^^^^^ S103
+46 |
+47 | # ============================================================================
+   |
+
+S103.py:60:27: S103 `os.chmod` setting world-writable permissions `0o666`
+   |
+59 | # Dangerous bitwise operations
+60 | os.chmod("/tmp/bit_bad1", 0o600 | 0o066)       # 0o666 (world-writable)
+   |                           ^^^^^^^^^^^^^ S103
+61 | os.chmod("/tmp/bit_bad2", 0o644 | 0o111)       # 0o755 (world-executable)
+62 | os.chmod("/tmp/bit_bad3", 0o700 | 0o077)       # 0o777 (world-writable)
+   |
+
+S103.py:61:27: S103 `os.chmod` setting world-executable permissions `0o755`
+   |
+59 | # Dangerous bitwise operations
+60 | os.chmod("/tmp/bit_bad1", 0o600 | 0o066)       # 0o666 (world-writable)
+61 | os.chmod("/tmp/bit_bad2", 0o644 | 0o111)       # 0o755 (world-executable)
+   |                           ^^^^^^^^^^^^^ S103
+62 | os.chmod("/tmp/bit_bad3", 0o700 | 0o077)       # 0o777 (world-writable)
+63 | os.chmod("/tmp/bit_bad4", 0o4000 | 0o755)      # 0o4755 (setuid)
+   |
+
+S103.py:62:27: S103 `os.chmod` setting world-writable permissions `0o777`
+   |
+60 | os.chmod("/tmp/bit_bad1", 0o600 | 0o066)       # 0o666 (world-writable)
+61 | os.chmod("/tmp/bit_bad2", 0o644 | 0o111)       # 0o755 (world-executable)
+62 | os.chmod("/tmp/bit_bad3", 0o700 | 0o077)       # 0o777 (world-writable)
+   |                           ^^^^^^^^^^^^^ S103
+63 | os.chmod("/tmp/bit_bad4", 0o4000 | 0o755)      # 0o4755 (setuid)
+64 | os.chmod("/tmp/bit_bad5", 0o2000 | 0o644)      # 0o2644 (setgid)
+   |
+
+S103.py:63:27: S103 `os.chmod` setting setuid/setgid permissions `0o4755`
+   |
+61 | os.chmod("/tmp/bit_bad2", 0o644 | 0o111)       # 0o755 (world-executable)
+62 | os.chmod("/tmp/bit_bad3", 0o700 | 0o077)       # 0o777 (world-writable)
+63 | os.chmod("/tmp/bit_bad4", 0o4000 | 0o755)      # 0o4755 (setuid)
+   |                           ^^^^^^^^^^^^^^ S103
+64 | os.chmod("/tmp/bit_bad5", 0o2000 | 0o644)      # 0o2644 (setgid)
+65 | os.chmod("/tmp/bit_bad6", 0o600 << 1)          # 0o1400 (if shift allowed, could be dangerous)
+   |
+
+S103.py:64:27: S103 `os.chmod` setting setuid/setgid permissions `0o2644`
+   |
+62 | os.chmod("/tmp/bit_bad3", 0o700 | 0o077)       # 0o777 (world-writable)
+63 | os.chmod("/tmp/bit_bad4", 0o4000 | 0o755)      # 0o4755 (setuid)
+64 | os.chmod("/tmp/bit_bad5", 0o2000 | 0o644)      # 0o2644 (setgid)
+   |                           ^^^^^^^^^^^^^^ S103
+65 | os.chmod("/tmp/bit_bad6", 0o600 << 1)          # 0o1400 (if shift allowed, could be dangerous)
+   |
+
+S103.py:69:27: S103 `os.chmod` setting world-writable permissions `0o777`
+   |
+67 | # Complex nested operations
+68 | os.chmod("/tmp/complex1", (0o700 | 0o040) & 0o744)   # Should be safe
+69 | os.chmod("/tmp/complex2", (0o600 | 0o066) | 0o111)   # Should be dangerous
+   |                           ^^^^^^^^^^^^^^^^^^^^^^^ S103
+70 | os.chmod("/tmp/complex3", 0o777 & (0o644 | 0o111))   # Should be dangerous
+   |
+
+S103.py:70:27: S103 `os.chmod` setting world-executable permissions `0o755`
+   |
+68 | os.chmod("/tmp/complex1", (0o700 | 0o040) & 0o744)   # Should be safe
+69 | os.chmod("/tmp/complex2", (0o600 | 0o066) | 0o111)   # Should be dangerous
+70 | os.chmod("/tmp/complex3", 0o777 & (0o644 | 0o111))   # Should be dangerous
+   |                           ^^^^^^^^^^^^^^^^^^^^^^^ S103
+71 |
+72 | # ============================================================================
+   |
+
+S103.py:83:28: S103 `os.chmod` setting world-writable permissions `0o777`
+   |
+82 | # Dangerous stat combinations
+83 | os.chmod("/tmp/stat_bad1", stat.S_IRWXU | stat.S_IRWXG | stat.S_IRWXO)  # 0o777
+   |                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ S103
+84 | os.chmod("/tmp/stat_bad2", stat.S_IRUSR | stat.S_IWUSR | stat.S_IWOTH)  # 0o602 (world-writable)
+85 | os.chmod("/tmp/stat_bad3", stat.S_ISUID | stat.S_IRWXU)                 # 0o4700 (setuid)
+   |
+
+S103.py:84:28: S103 `os.chmod` setting world-writable permissions `0o602`
+   |
+82 | # Dangerous stat combinations
+83 | os.chmod("/tmp/stat_bad1", stat.S_IRWXU | stat.S_IRWXG | stat.S_IRWXO)  # 0o777
+84 | os.chmod("/tmp/stat_bad2", stat.S_IRUSR | stat.S_IWUSR | stat.S_IWOTH)  # 0o602 (world-writable)
+   |                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ S103
+85 | os.chmod("/tmp/stat_bad3", stat.S_ISUID | stat.S_IRWXU)                 # 0o4700 (setuid)
+86 | os.chmod("/tmp/stat_bad4", stat.S_ISGID | stat.S_IRWXU | stat.S_IRWXG)  # 0o2770 (setgid)
+   |
+
+S103.py:85:28: S103 `os.chmod` setting setuid/setgid permissions `0o4700`
+   |
+83 | os.chmod("/tmp/stat_bad1", stat.S_IRWXU | stat.S_IRWXG | stat.S_IRWXO)  # 0o777
+84 | os.chmod("/tmp/stat_bad2", stat.S_IRUSR | stat.S_IWUSR | stat.S_IWOTH)  # 0o602 (world-writable)
+85 | os.chmod("/tmp/stat_bad3", stat.S_ISUID | stat.S_IRWXU)                 # 0o4700 (setuid)
+   |                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^ S103
+86 | os.chmod("/tmp/stat_bad4", stat.S_ISGID | stat.S_IRWXU | stat.S_IRWXG)  # 0o2770 (setgid)
+87 | os.chmod("/tmp/stat_bad5", stat.S_IRWXU | stat.S_IXOTH)                 # 0o701 (world-executable)
+   |
+
+S103.py:86:28: S103 `os.chmod` setting setuid/setgid permissions `0o2770`
+   |
+84 | os.chmod("/tmp/stat_bad2", stat.S_IRUSR | stat.S_IWUSR | stat.S_IWOTH)  # 0o602 (world-writable)
+85 | os.chmod("/tmp/stat_bad3", stat.S_ISUID | stat.S_IRWXU)                 # 0o4700 (setuid)
+86 | os.chmod("/tmp/stat_bad4", stat.S_ISGID | stat.S_IRWXU | stat.S_IRWXG)  # 0o2770 (setgid)
+   |                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ S103
+87 | os.chmod("/tmp/stat_bad5", stat.S_IRWXU | stat.S_IXOTH)                 # 0o701 (world-executable)
+88 | os.chmod("/tmp/stat_bad6", stat.S_IRWXU | stat.S_IRWXG)                 # 0o770 (overly permissive group)
+   |
+
+S103.py:87:28: S103 `os.chmod` setting world-executable permissions `0o701`
+   |
+85 | os.chmod("/tmp/stat_bad3", stat.S_ISUID | stat.S_IRWXU)                 # 0o4700 (setuid)
+86 | os.chmod("/tmp/stat_bad4", stat.S_ISGID | stat.S_IRWXU | stat.S_IRWXG)  # 0o2770 (setgid)
+87 | os.chmod("/tmp/stat_bad5", stat.S_IRWXU | stat.S_IXOTH)                 # 0o701 (world-executable)
+   |                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^ S103
+88 | os.chmod("/tmp/stat_bad6", stat.S_IRWXU | stat.S_IRWXG)                 # 0o770 (overly permissive group)
+   |
+
+S103.py:88:28: S103 `os.chmod` setting overly permissive group permissions `0o770`
+   |
+86 | os.chmod("/tmp/stat_bad4", stat.S_ISGID | stat.S_IRWXU | stat.S_IRWXG)  # 0o2770 (setgid)
+87 | os.chmod("/tmp/stat_bad5", stat.S_IRWXU | stat.S_IXOTH)                 # 0o701 (world-executable)
+88 | os.chmod("/tmp/stat_bad6", stat.S_IRWXU | stat.S_IRWXG)                 # 0o770 (overly permissive group)
+   |                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^ S103
+89 |
+90 | # Mixed stat and octal
+   |
+
+S103.py:91:25: S103 `os.chmod` setting world-writable permissions `0o766`
+   |
+90 | # Mixed stat and octal
+91 | os.chmod("/tmp/mixed1", stat.S_IRWXU | 0o066)    # 0o766 (world-writable)
+   |                         ^^^^^^^^^^^^^^^^^^^^ S103
+92 | os.chmod("/tmp/mixed2", 0o700 | stat.S_IROTH)    # 0o704 (safe)
+93 | os.chmod("/tmp/mixed3", 0o4000 | stat.S_IRWXU)   # 0o4700 (setuid)
+   |
+
+S103.py:93:25: S103 `os.chmod` setting setuid/setgid permissions `0o4700`
+   |
+91 | os.chmod("/tmp/mixed1", stat.S_IRWXU | 0o066)    # 0o766 (world-writable)
+92 | os.chmod("/tmp/mixed2", 0o700 | stat.S_IROTH)    # 0o704 (safe)
+93 | os.chmod("/tmp/mixed3", 0o4000 | stat.S_IRWXU)   # 0o4700 (setuid)
+   |                         ^^^^^^^^^^^^^^^^^^^^^ S103
+94 |
+95 | # ============================================================================
+   |
+
+S103.py:100:25: S103 `os.chmod` setting setuid/setgid permissions `0o177700`
+    |
+ 99 | # Bitwise NOT operations (these might be tricky)
+100 | os.chmod("/tmp/unary1", ~0o077)      # Should be safe (inverts to owner-only roughly)
+    |                         ^^^^^^ S103
+101 | os.chmod("/tmp/unary2", ~0o000)      # Should be dangerous (all bits set)
+    |
+
+S103.py:101:25: S103 `os.chmod` setting setuid/setgid permissions `0o177777`
+    |
+ 99 | # Bitwise NOT operations (these might be tricky)
+100 | os.chmod("/tmp/unary1", ~0o077)      # Should be safe (inverts to owner-only roughly)
+101 | os.chmod("/tmp/unary2", ~0o000)      # Should be dangerous (all bits set)
+    |                         ^^^^^^ S103
+102 |
+103 | # Positive/negative unary
+    |
+
+S103.py:132:27: S103 `os.chmod` setting world-writable permissions `0o777`
+    |
+131 | # Decimal equivalents of dangerous octal numbers
+132 | os.chmod("/tmp/decimal1", 511)    # 511 = 0o777 (dangerous)
+    |                           ^^^ S103
+133 | os.chmod("/tmp/decimal2", 438)    # 438 = 0o666 (dangerous)
+134 | os.chmod("/tmp/decimal3", 493)    # 493 = 0o755 (dangerous)
+    |
+
+S103.py:133:27: S103 `os.chmod` setting world-writable permissions `0o666`
+    |
+131 | # Decimal equivalents of dangerous octal numbers
+132 | os.chmod("/tmp/decimal1", 511)    # 511 = 0o777 (dangerous)
+133 | os.chmod("/tmp/decimal2", 438)    # 438 = 0o666 (dangerous)
+    |                           ^^^ S103
+134 | os.chmod("/tmp/decimal3", 493)    # 493 = 0o755 (dangerous)
+135 | os.chmod("/tmp/decimal4", 420)    # 420 = 0o644 (safe)
+    |
+
+S103.py:134:27: S103 `os.chmod` setting world-executable permissions `0o755`
+    |
+132 | os.chmod("/tmp/decimal1", 511)    # 511 = 0o777 (dangerous)
+133 | os.chmod("/tmp/decimal2", 438)    # 438 = 0o666 (dangerous)
+134 | os.chmod("/tmp/decimal3", 493)    # 493 = 0o755 (dangerous)
+    |                           ^^^ S103
+135 | os.chmod("/tmp/decimal4", 420)    # 420 = 0o644 (safe)
+    |
+
+S103.py:138:23: S103 `os.chmod` setting world-writable permissions `0o777`
+    |
+137 | # Hexadecimal equivalents
+138 | os.chmod("/tmp/hex1", 0x1FF)      # 0x1FF = 511 = 0o777 (dangerous)
+    |                       ^^^^^ S103
+139 | os.chmod("/tmp/hex2", 0x1B6)      # 0x1B6 = 438 = 0o666 (dangerous)
+140 | os.chmod("/tmp/hex3", 0x1ED)      # 0x1ED = 493 = 0o755 (dangerous)
+    |
+
+S103.py:139:23: S103 `os.chmod` setting world-writable permissions `0o666`
+    |
+137 | # Hexadecimal equivalents
+138 | os.chmod("/tmp/hex1", 0x1FF)      # 0x1FF = 511 = 0o777 (dangerous)
+139 | os.chmod("/tmp/hex2", 0x1B6)      # 0x1B6 = 438 = 0o666 (dangerous)
+    |                       ^^^^^ S103
+140 | os.chmod("/tmp/hex3", 0x1ED)      # 0x1ED = 493 = 0o755 (dangerous)
+141 | os.chmod("/tmp/hex4", 0x1A4)      # 0x1A4 = 420 = 0o644 (safe)
+    |
+
+S103.py:140:23: S103 `os.chmod` setting world-executable permissions `0o755`
+    |
+138 | os.chmod("/tmp/hex1", 0x1FF)      # 0x1FF = 511 = 0o777 (dangerous)
+139 | os.chmod("/tmp/hex2", 0x1B6)      # 0x1B6 = 438 = 0o666 (dangerous)
+140 | os.chmod("/tmp/hex3", 0x1ED)      # 0x1ED = 493 = 0o755 (dangerous)
+    |                       ^^^^^ S103
+141 | os.chmod("/tmp/hex4", 0x1A4)      # 0x1A4 = 420 = 0o644 (safe)
+    |
+
+S103.py:148:25: S103 `os.chmod` setting overly permissive group permissions `0o770`
+    |
+147 | # Test the group permission logic specifically
+148 | os.chmod("/tmp/group1", 0o770)    # Error - overly permissive group
+    |                         ^^^^^ S103
+149 | os.chmod("/tmp/group2", 0o760)    # OK - group read/write only
+150 | os.chmod("/tmp/group3", 0o750)    # OK - group read/execute only
+    |
+
+S103.py:152:25: S103 `os.chmod` setting overly permissive group permissions `0o70`
+    |
+150 | os.chmod("/tmp/group3", 0o750)    # OK - group read/execute only
+151 | os.chmod("/tmp/group4", 0o740)    # OK - group read only
+152 | os.chmod("/tmp/group5", 0o070)    # Error - only group permissions, all set
+    |                         ^^^^^ S103
+153 | os.chmod("/tmp/group6", 0o060)    # OK - only group read/write
+154 | os.chmod("/tmp/group7", 0o010)    # OK - only group execute
+    |
+
+S103.py:161:26: S103 `os.chmod` setting setuid/setgid permissions `0o4755`
+    |
+160 | # Various setuid combinations
+161 | os.chmod("/tmp/setuid1", 0o4755)   # Error - setuid + world-executable
+    |                          ^^^^^^ S103
+162 | os.chmod("/tmp/setuid2", 0o4750)   # Error - setuid + group-executable
+163 | os.chmod("/tmp/setuid3", 0o4700)   # Error - setuid + owner-only
+    |
+
+S103.py:162:26: S103 `os.chmod` setting setuid/setgid permissions `0o4750`
+    |
+160 | # Various setuid combinations
+161 | os.chmod("/tmp/setuid1", 0o4755)   # Error - setuid + world-executable
+162 | os.chmod("/tmp/setuid2", 0o4750)   # Error - setuid + group-executable
+    |                          ^^^^^^ S103
+163 | os.chmod("/tmp/setuid3", 0o4700)   # Error - setuid + owner-only
+164 | os.chmod("/tmp/setuid4", 0o4644)   # Error - setuid + readable
+    |
+
+S103.py:163:26: S103 `os.chmod` setting setuid/setgid permissions `0o4700`
+    |
+161 | os.chmod("/tmp/setuid1", 0o4755)   # Error - setuid + world-executable
+162 | os.chmod("/tmp/setuid2", 0o4750)   # Error - setuid + group-executable
+163 | os.chmod("/tmp/setuid3", 0o4700)   # Error - setuid + owner-only
+    |                          ^^^^^^ S103
+164 | os.chmod("/tmp/setuid4", 0o4644)   # Error - setuid + readable
+    |
+
+S103.py:164:26: S103 `os.chmod` setting setuid/setgid permissions `0o4644`
+    |
+162 | os.chmod("/tmp/setuid2", 0o4750)   # Error - setuid + group-executable
+163 | os.chmod("/tmp/setuid3", 0o4700)   # Error - setuid + owner-only
+164 | os.chmod("/tmp/setuid4", 0o4644)   # Error - setuid + readable
+    |                          ^^^^^^ S103
+165 |
+166 | # Various setgid combinations
+    |
+
+S103.py:167:26: S103 `os.chmod` setting setuid/setgid permissions `0o2755`
+    |
+166 | # Various setgid combinations
+167 | os.chmod("/tmp/setgid1", 0o2755)   # Error - setgid + world-executable
+    |                          ^^^^^^ S103
+168 | os.chmod("/tmp/setgid2", 0o2750)   # Error - setgid + group-executable
+169 | os.chmod("/tmp/setgid3", 0o2700)   # Error - setgid + owner-only
+    |
+
+S103.py:168:26: S103 `os.chmod` setting setuid/setgid permissions `0o2750`
+    |
+166 | # Various setgid combinations
+167 | os.chmod("/tmp/setgid1", 0o2755)   # Error - setgid + world-executable
+168 | os.chmod("/tmp/setgid2", 0o2750)   # Error - setgid + group-executable
+    |                          ^^^^^^ S103
+169 | os.chmod("/tmp/setgid3", 0o2700)   # Error - setgid + owner-only
+    |
+
+S103.py:169:26: S103 `os.chmod` setting setuid/setgid permissions `0o2700`
+    |
+167 | os.chmod("/tmp/setgid1", 0o2755)   # Error - setgid + world-executable
+168 | os.chmod("/tmp/setgid2", 0o2750)   # Error - setgid + group-executable
+169 | os.chmod("/tmp/setgid3", 0o2700)   # Error - setgid + owner-only
+    |                          ^^^^^^ S103
+170 |
+171 | # Both setuid and setgid
+    |
+
+S103.py:172:24: S103 `os.chmod` setting setuid/setgid permissions `0o6755`
+    |
+171 | # Both setuid and setgid
+172 | os.chmod("/tmp/both1", 0o6755)     # Error - both + world-executable
+    |                        ^^^^^^ S103
+173 | os.chmod("/tmp/both2", 0o6700)     # Error - both + owner-only
+    |
+
+S103.py:173:24: S103 `os.chmod` setting setuid/setgid permissions `0o6700`
+    |
+171 | # Both setuid and setgid
+172 | os.chmod("/tmp/both1", 0o6755)     # Error - both + world-executable
+173 | os.chmod("/tmp/both2", 0o6700)     # Error - both + owner-only
+    |                        ^^^^^^ S103
+174 |
+175 | # Sticky bit (0o1000) - should this be flagged?
+    |
+
+S103.py:176:26: S103 `os.chmod` setting world-writable permissions `0o1777`
+    |
+175 | # Sticky bit (0o1000) - should this be flagged?
+176 | os.chmod("/tmp/sticky1", 0o1777)   # Error - sticky + world-writable
+    |                          ^^^^^^ S103
+177 | os.chmod("/tmp/sticky2", 0o1755)   # Error - sticky + world-executable
+178 | os.chmod("/tmp/sticky3", 0o1644)   # OK - sticky + safe permissions
+    |
+
+S103.py:177:26: S103 `os.chmod` setting world-executable permissions `0o1755`
+    |
+175 | # Sticky bit (0o1000) - should this be flagged?
+176 | os.chmod("/tmp/sticky1", 0o1777)   # Error - sticky + world-writable
+177 | os.chmod("/tmp/sticky2", 0o1755)   # Error - sticky + world-executable
+    |                          ^^^^^^ S103
+178 | os.chmod("/tmp/sticky3", 0o1644)   # OK - sticky + safe permissions
+    |

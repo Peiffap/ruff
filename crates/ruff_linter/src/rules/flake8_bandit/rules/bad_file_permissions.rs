@@ -109,7 +109,7 @@ fn check_dangerous_permissions(mask: u16) -> Option<&'static str> {
         None
     }
 }
-
+#[allow(clippy::match_wildcard_for_single_variants)]
 fn parse_mask(expr: &Expr, semantic: &SemanticModel) -> Result<Option<u16>> {
     match expr {
         Expr::NumberLiteral(ast::ExprNumberLiteral {
@@ -138,7 +138,7 @@ fn parse_mask(expr: &Expr, semantic: &SemanticModel) -> Result<Option<u16>> {
                 Operator::BitAnd => l & r,
                 Operator::BitOr => l | r,
                 Operator::BitXor => l ^ r,
-                Operator::LShift if r <= 15 => l.checked_shl(r as u32).unwrap_or(0),
+                Operator::LShift if r <= 15 => l.checked_shl(u32::from(r)).unwrap_or(0),
                 Operator::RShift => l >> r.min(15),
                 _ => return Ok(None),
             }))
